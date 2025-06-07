@@ -24,7 +24,7 @@ async function run() {
     const videoReaderService = Comlink.wrap(
         new Worker('./js/VideoReader.js', { 
           name: JSON.stringify({
-            src: `http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`,
+            src: `${document.location.protocol}//commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`,
             seek: 20,
             chunkSize: (1024 * 1024) * 0.5,
             samplesPerChunk: 10,
@@ -55,7 +55,7 @@ async function run() {
         duration,
         audio: [
           {
-            src: `http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`,
+            src: `${document.location.protocol}//commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`,
             start: 2, // align with video
             end: duration,
             seek: 20, // align with video
