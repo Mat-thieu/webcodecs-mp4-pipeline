@@ -35,7 +35,7 @@ async function run() {
     const videoReaderService2 = Comlink.wrap(
         new Worker('./js/VideoReader.js', { 
           name: JSON.stringify({
-            src: `${document.location.origin}/assets/ForBiggerJoyrides.mp4`,
+            src: `${document.location.protocol}//commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4`,
             seek: 0,
             chunkSize: (1024 * 1024) * 0.5,
             samplesPerChunk: 10,
