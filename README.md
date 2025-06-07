@@ -4,6 +4,9 @@ Bare bones implementation of a video rendering pipeline, using only browser APIs
 This project showcases scene composition using canvas, rendering it to MP4 using the native VideoEncoder.
 Webworkers and on-the-fly asset retrieval, demuxing and decoding are used to provide non-blocking and efficient video-in-video. 
 
+[Try it out here](https://mat-thieu.github.io/webcodecs-mp4-pipeline/)
+First render might be slow, subsequent renders are faster because the assets will have been cached.
+
 ![videoframe_8470](https://github.com/user-attachments/assets/32ddd225-0bb8-4e3d-a82e-c841a3a78b2d)
 
 ## Features
