@@ -4,10 +4,6 @@ Bare bones implementation of a video rendering pipeline, using only browser APIs
 This project showcases scene composition using canvas, rendering it to MP4 using the native VideoEncoder.
 Webworkers and on-the-fly asset retrieval, demuxing and decoding are used to provide non-blocking and efficient video-in-video. 
 
-
-Don't use this in production in its current state, without a prewarmed asset cache the decoder might close.
-
-
 ![videoframe_8470](https://github.com/user-attachments/assets/32ddd225-0bb8-4e3d-a82e-c841a3a78b2d)
 
 ## Features
