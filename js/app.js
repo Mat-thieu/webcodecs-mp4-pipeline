@@ -24,9 +24,9 @@ async function run() {
     const videoReaderService = Comlink.wrap(
         new Worker('./js/VideoReader.js', { 
           name: JSON.stringify({
-            src: `${document.location.protocol}//commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`,
+            src: `http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`,
             seek: 20,
-            chunkSize: (1024 * 1024) * 0.25,
+            chunkSize: (1024 * 1024) * 0.5,
             samplesPerChunk: 10,
           }),
         })
@@ -35,9 +35,9 @@ async function run() {
     const videoReaderService2 = Comlink.wrap(
         new Worker('./js/VideoReader.js', { 
           name: JSON.stringify({
-            src: `${document.location.protocol}//commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4`,
+            src: `${document.location.href}/assets/ForBiggerJoyrides.mp4`,
             seek: 0,
-            chunkSize: (1024 * 1024) * 0.25,
+            chunkSize: (1024 * 1024) * 0.5,
             samplesPerChunk: 10,
           }),
         })
@@ -55,7 +55,7 @@ async function run() {
         duration,
         audio: [
           {
-            src: `${document.location.protocol}//commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`,
+            src: `http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`,
             start: 2, // align with video
             end: duration,
             seek: 20, // align with video
