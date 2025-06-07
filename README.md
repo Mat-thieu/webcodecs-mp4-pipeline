@@ -4,6 +4,8 @@ Bare bones setup of a video rendering pipeline, only using browser APIs (no wasm
 This project showcases end-to-end video-in-video usage.
 Compose a scene using multiple videos, these are decoded on-the-fly by workers as the main rendering process requests frames, the main process can then draw frames using canvas to position and modify them as desired. 
 
+![videoframe_8470](https://github.com/user-attachments/assets/32ddd225-0bb8-4e3d-a82e-c841a3a78b2d)
+
 ## Features
 
 - Video-in-video
