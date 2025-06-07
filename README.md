@@ -4,7 +4,7 @@ Bare bones implementation of a video rendering pipeline, using only browser APIs
 This project showcases scene composition using canvas, rendering it to MP4 using the native VideoEncoder.
 Webworkers and on-the-fly asset retrieval, demuxing and decoding are used to provide non-blocking and efficient video-in-video. 
 
-[Try it out here](https://mat-thieu.github.io/webcodecs-mp4-pipeline/) If you don't have hardware acceleration (A GPU, or the setting is off) your tab may crash. There's a known bug the code where the lack of hardware acceleration doesn't impose limits on the amount of cached VideoFrames
+[Try it out here](https://mat-thieu.github.io/webcodecs-mp4-pipeline/) If you don't have hardware acceleration (A GPU, or the setting is off) your tab may crash. There's a known bug code where the lack of hardware acceleration doesn't impose limits on the amount of cached VideoFrames
 
 ![videoframe_8470](https://github.com/user-attachments/assets/32ddd225-0bb8-4e3d-a82e-c841a3a78b2d)
 
