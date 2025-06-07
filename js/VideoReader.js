@@ -116,10 +116,12 @@ class VideoReader { // Removed "export default"
       return new Promise((resolve) => {
         this.nextFrameCb = (nFrame) => {
           this.nextFrameCb = null;
+          this.queueCheckDebounced();
           resolve(Comlink.transfer({ frame: nFrame }, [nFrame]));
         }
       });
     }
+    this.queueCheckDebounced();
     return Comlink.transfer({ frame }, [frame]);
   }
 
@@ -169,10 +171,9 @@ class VideoReader { // Removed "export default"
   }
 
   checkQueues() {
-    console.log(this.cachedFrames.length);
     const samplerPaused = (this.mp4boxFile.extractedTracks[0].samples.length !== this.samplesPerChunk);
     const decoderPaused = !this.videoDecoder.decodeQueueSize;
-    if (samplerPaused && decoderPaused) {
+    if (samplerPaused && decoderPaused && this.cachedFrames.length < 11) { // 11 is the limit for cached frames when using hardware acceleration
       this.readChunk();
       return;
     }
