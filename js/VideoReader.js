@@ -28,6 +28,7 @@ class VideoReader { // Removed "export default"
   nextFrameCb = null;
 
   flushed = false; // Whether the reader has been flushed
+  chunkReadInProgress = false; // Whether a chunk is currently being read
 
   constructor({
     src = null,
@@ -54,7 +55,6 @@ class VideoReader { // Removed "export default"
     console.log("Setting up MP4Box...");
     this.mp4boxFile = MP4Box.createFile();
     this.fileSize = await getFileSize(this.src);
-    this.readChunk();
 
     return await new Promise(async (resolve) => {
       this.mp4boxFile.onReady = async (info) => {
@@ -70,6 +70,8 @@ class VideoReader { // Removed "export default"
 
         resolve(sample);
       };
+
+      await this.readChunk();
     });
   }
 
@@ -176,10 +178,14 @@ class VideoReader { // Removed "export default"
   }
 
   async readChunk() {
+    if (this.chunkReadInProgress) {
+      return;
+    }
     if (this.chunkOffset >= this.fileSize) {
       console.log("Reached max size");
       return false;
     }
+    this.chunkReadInProgress = true;
     // Ensure the range does not exceed the file size
     const end = Math.min(this.chunkOffset + this.chunkSize - 1, this.fileSize - 1);
     const headers = new Headers();
@@ -189,9 +195,11 @@ class VideoReader { // Removed "export default"
     try {
       const response = await fetch(this.src, { headers });
       if (!response.ok) {
+        this.chunkReadInProgress = false;
         throw new Error("Network response was not ok");
       }
       if (response.status === 416) {
+        this.chunkReadInProgress = false;
         console.error("Requested range not satisfiable");
         return;
       }
@@ -200,8 +208,10 @@ class VideoReader { // Removed "export default"
       this.mp4boxFile.appendBuffer(arrayBuffer);
 
       this.chunkOffset += this.chunkSize;
+      this.chunkReadInProgress = false;
       return true;
     } catch (error) {
+      this.chunkReadInProgress = false;
       console.error("Error fetching chunk:", error);
     }
   }

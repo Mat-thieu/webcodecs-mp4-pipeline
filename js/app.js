@@ -26,7 +26,7 @@ async function run() {
           name: JSON.stringify({
             src: `${document.location.protocol}//commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`,
             seek: 20,
-            chunkSize: (1024 * 1024) * 0.5,
+            chunkSize: (1024 * 1024) * 1,
             samplesPerChunk: 10,
           }),
         })
@@ -37,7 +37,7 @@ async function run() {
           name: JSON.stringify({
             src: `${document.location.href}/assets/ForBiggerJoyrides.mp4`,
             seek: 0,
-            chunkSize: (1024 * 1024) * 0.5,
+            chunkSize: (1024 * 1024) * 1,
             samplesPerChunk: 10,
           }),
         })
