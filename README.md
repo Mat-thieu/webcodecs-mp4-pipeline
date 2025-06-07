@@ -14,8 +14,10 @@ Webworkers and on-the-fly asset retrieval, demuxing and decoding are used to pro
 - Efficient memory usage
 - Scene composition using HTML canvas
 - Audio composition
-- Roughly 3x realtime performance at 1920x1080 24fps on a 6-year old, mid-tier laptop (If cache is prewarmed, second render or using local assets)
 - Download video as MP4
+- Performance metrics at 1920x1080 24fps (prewarmed cache)
+- Roughly 3x realtime on a 6-year old, mid-tier laptop
+- Roughly 10x realtime on a 5-year old, high-end desktop 
 
 ## Backpressure flow
 
