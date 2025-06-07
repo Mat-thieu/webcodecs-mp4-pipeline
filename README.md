@@ -1,8 +1,8 @@
 # WebCodecs MP4 Pipeline
 
-Bare bones setup of a video rendering pipeline, only using browser APIs (no wasm).
-This project showcases end-to-end video-in-video usage.
-Compose a scene using multiple videos, these are decoded on-the-fly by workers as the main rendering process requests frames, the main process can then draw frames using canvas to position and modify them as desired. 
+Bare bones implementation of a video rendering pipeline, using only browser APIs.
+This project showcases scene composition using canvas, rendering it to MP4 using the native VideoEncoder.
+Webworkers and on-the-fly asset retrieval, demuxing and decoding are used to provide non-blocking and efficient video-in-video. 
 
 ![videoframe_8470](https://github.com/user-attachments/assets/32ddd225-0bb8-4e3d-a82e-c841a3a78b2d)
 
@@ -17,7 +17,7 @@ Compose a scene using multiple videos, these are decoded on-the-fly by workers a
 
 ## Backpressure flow
 
-While working on this project I set out to properly implement backpressure for video-in-video, there are a lot of moving parts, and knowing when each part is ready to process more data isn't trivial. Backpressure is the mechanism that makes sure memory isn't completely filled up, the process is a chain of the following steps;
+While working on this project I set out to properly implement backpressure for video-in-video, there are a lot of moving parts, and knowing when each part is ready to process more data isn't trivial. Backpressure is the mechanism that ensures memory isn't excessively filled up, the process resides in a chain of the following steps;
 
 - Download chunk of input video (fetch from range)
 - Demux chunk of input video (mp4box samples)
@@ -27,7 +27,7 @@ While working on this project I set out to properly implement backpressure for v
 - Encode new frame in final video (VideoEncoder)
 - Mux new data chunk for final video (mp4-muxer)
 
-Each step has its own strategy and sometimes relies on some undocumented features to achieve backpressure. Other times the APIs are too limited to know a change is coming in, and so very short-interval polling is utilized here and there to check queue status.
+Each step has its own strategy and sometimes relies on some undocumented features to achieve backpressure. Other times the APIs are too limited, so very short-interval polling is utilized to check queue status.
 
 ## Running the project
 
@@ -38,9 +38,7 @@ Nothing to install, all packages come from CDN and there's no bundling.
 npm start
 ```
 
-## Dependency usage
-
-Given there's no native muxing/demuxing APIs, libraries have to fill in there. 
+## Dependency usage 
 
 - [comlink](https://github.com/GoogleChromeLabs/comlink), Straightforward Webworkers with RPC
 - [mp4box.js](https://github.com/gpac/mp4box.js/), Demuxing input video(s)
@@ -59,3 +57,4 @@ Given there's no native muxing/demuxing APIs, libraries have to fill in there.
 - Allow mismatching FPS between input video and final video, currently not accounted for, always 24fps
 - Gradual writing of output file while muxing, currently one large chunk
 - HDR, which is now available for canvas behind experimental flags, but other approaches may without flags
+
