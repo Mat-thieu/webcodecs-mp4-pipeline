@@ -16,8 +16,8 @@ Webworkers and on-the-fly asset retrieval, demuxing and decoding are used to pro
 - Audio composition
 - Download video as MP4
 - Performance metrics at 1920x1080 24fps (prewarmed cache)
-- Roughly 3x realtime on a 6-year old, mid-tier laptop
-- Roughly 10x realtime on a 5-year old, high-end desktop 
+  - Roughly 3x realtime on a 6-year old, mid-tier laptop
+  - Roughly 10x realtime on a 5-year old, high-end desktop 
 
 ## Backpressure flow
 
