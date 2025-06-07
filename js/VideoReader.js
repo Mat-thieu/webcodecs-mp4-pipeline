@@ -169,6 +169,7 @@ class VideoReader { // Removed "export default"
   }
 
   checkQueues() {
+    console.log(this.cachedFrames.length);
     const samplerPaused = (this.mp4boxFile.extractedTracks[0].samples.length !== this.samplesPerChunk);
     const decoderPaused = !this.videoDecoder.decodeQueueSize;
     if (samplerPaused && decoderPaused) {
