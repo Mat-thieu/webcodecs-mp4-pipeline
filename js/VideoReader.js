@@ -48,7 +48,34 @@ class VideoReader { // Removed "export default"
     const sample = await this.setupMp4Box();
     await this.setupDecoder(sample);
     this.setupSampleToDecoder();
-    this.readChunk();
+    this.readNextChunk();
+  }
+
+  // Public
+  async flushReader() {
+    if (this.flushed) return;
+    this.flushed = true;
+
+    this.mp4boxFile.flush();
+    await this.videoDecoder.flush();
+    this.videoDecoder.close();
+  }
+
+  // Public
+  async consumeFrame() {
+    const frame = this.cachedFrames.shift();
+    // If no cached frame, wait until one is available
+    if (!frame) {
+      return new Promise((resolve) => {
+        this.nextFrameCb = (nFrame) => {
+          this.nextFrameCb = null;
+          this.queueCheckDebounced();
+          resolve(Comlink.transfer({ frame: nFrame }, [nFrame]));
+        }
+      });
+    }
+    this.queueCheckDebounced();
+    return Comlink.transfer({ frame }, [frame]);
   }
 
   async setupMp4Box() {
@@ -70,7 +97,7 @@ class VideoReader { // Removed "export default"
         resolve(sample);
       };
 
-      await this.readChunk();
+      await this.readNextChunk();
     });
   }
 
@@ -79,7 +106,7 @@ class VideoReader { // Removed "export default"
     const decoderDesc = getAvcDecoderDescription(sample);
 
     this.videoDecoder = new VideoDecoder({
-      output: (videoFrame) => this.#handleDecodedFrame(videoFrame),
+      output: (videoFrame) => this.handleDecodedFrame(videoFrame),
       error: (e) => console.error(e),
     });
 
@@ -92,7 +119,40 @@ class VideoReader { // Removed "export default"
     this.videoDecoder.configure(decoderConfig);
   }
 
-  #handleDecodedFrame(videoFrame) {
+  setupSampleToDecoder() {
+    console.log("Setting up sample extraction...", this);
+    // Extract samples from the video track
+    this.mp4boxFile.setExtractionOptions(this.videoTrack.id, "USER_VIDEO_TRACK", {
+      nbSamples: this.samplesPerChunk,
+    });
+    this.mp4boxFile.start();
+
+    const sendSampleToDecoder = (sample) => {
+      this.currentSamples++;
+      // Create an EncodedVideoChunk with the sample data and dts
+      const isKeyChunk = sample.is_sync;
+      const encodedChunk = new EncodedVideoChunk({
+        type: isKeyChunk ? "key" : "delta",
+        timestamp: sample.dts,
+        duration: sample.duration,
+        data: sample.data.buffer,
+      });
+      this.videoDecoder.decode(encodedChunk);
+      this.mp4boxFile.releaseUsedSamples(this.videoTrack.id, sample.number + 1);
+
+      // Cleanup and flush when all samples are processed
+      if (this.currentSamples === this.totalSamples) {
+        this.flushReader();
+      }
+    }
+
+    this.mp4boxFile.onSamples = (track_id, ref, samples) => {
+      samples.forEach(sendSampleToDecoder);
+      this.queueCheckDebounced();
+    };
+  }
+
+  handleDecodedFrame(videoFrame) {
     // TODO make sure the sampler doesn't send chunks we don't need. Harder than it seems because we require a keyframe first
     const frameTime = videoFrame.timestamp / this.videoTrack.timescale;
     if (frameTime < this.seek) { // TODO actual seek with mp4box
@@ -108,74 +168,16 @@ class VideoReader { // Removed "export default"
     this.queueCheckDebounced();
   }
 
-  async consumeFrame() {
-    const frame = this.cachedFrames.shift();
-    // If no cached frame, wait until one is available
-    if (!frame) {
-      return new Promise((resolve) => {
-        this.nextFrameCb = (nFrame) => {
-          this.nextFrameCb = null;
-          this.queueCheckDebounced();
-          resolve(Comlink.transfer({ frame: nFrame }, [nFrame]));
-        }
-      });
-    }
-    this.queueCheckDebounced();
-    return Comlink.transfer({ frame }, [frame]);
-  }
-
-  setupSampleToDecoder() {
-    console.log("Setting up sample extraction...", this);
-    // Extract samples from the video track
-    this.mp4boxFile.setExtractionOptions(this.videoTrack.id, "USER_VIDEO_TRACK", {
-      nbSamples: this.samplesPerChunk,
-    });
-    this.mp4boxFile.start();
-
-    // let lastKeyChunk = null;
-    this.mp4boxFile.onSamples = (track_id, ref, samples) => {
-      samples.forEach((sample) => {
-        this.currentSamples++;
-        // Create an EncodedVideoChunk with the sample data and dts
-        const isKeyChunk = sample.is_sync;
-        const encodedChunk = new EncodedVideoChunk({
-          type: isKeyChunk ? "key" : "delta",
-          timestamp: sample.dts,
-          duration: sample.duration,
-          data: sample.data.buffer,
-        });
-        this.videoDecoder.decode(encodedChunk);
-        this.mp4boxFile.releaseUsedSamples(this.videoTrack.id, sample.number + 1);
-
-        // Cleanup and flush when all samples
-        if (this.currentSamples === this.totalSamples) {
-          this.flushReader();
-        }
-      });
-
-      this.queueCheckDebounced();
-    };
-  }
-
-  async flushReader() {
-    if (this.flushed) return;
-    this.flushed = true;
-
-    this.mp4boxFile.flush();
-    await this.videoDecoder.flush();
-    this.videoDecoder.close();
-  }
-
   checkQueues() {
     const samplerPaused = (this.mp4boxFile.extractedTracks[0].samples.length !== this.samplesPerChunk);
     const decoderPaused = !this.videoDecoder.decodeQueueSize;
     if (samplerPaused && decoderPaused && this.cachedFrames.length < 11) { // 11 is the limit for cached frames when using hardware acceleration
-      this.readChunk();
+      this.readNextChunk();
       return;
     }
   }
 
-  async readChunk() {
+  async readNextChunk() {
     if (this.chunkReadInProgress) {
       return;
     }

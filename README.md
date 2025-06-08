@@ -4,6 +4,10 @@ Bare bones implementation of a video rendering pipeline, using only browser APIs
 This project showcases scene composition using canvas, rendering it to MP4 using the native VideoEncoder.
 Webworkers and on-the-fly asset retrieval, demuxing and decoding are used to provide non-blocking and efficient video-in-video. 
 
+
+Don't use this in production as-is, a lot more needs to be done for it to be stable, safe and performant.
+
+
 [Try it out here](https://mat-thieu.github.io/webcodecs-mp4-pipeline/) First render may be slow, may also be slow without hardware acceleration.
 
 ![videoframe_8470](https://github.com/user-attachments/assets/32ddd225-0bb8-4e3d-a82e-c841a3a78b2d)
@@ -51,7 +55,6 @@ npm start
 
 ## Todos and other considerations
 
-- Wrap it in a neat library some day
 - Currently only a decoder description for AVC codecs is provided
 - Use seek for decoder using MOOV box indexing, instead of decoding from start till seek point
 - VideoDecoders are being overcrowded a bit, hold onto samples until the queue lowers
@@ -61,4 +64,5 @@ npm start
 - Allow mismatching FPS between input video and final video, currently not accounted for, always 24fps
 - Gradual writing of output file while muxing, currently one large chunk
 - HDR, which is now available for canvas behind experimental flags, but other approaches may without flags
+- Wrap it in a neat library some day
 
