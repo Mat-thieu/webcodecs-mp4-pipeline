@@ -53,15 +53,13 @@ async function run() {
         height: canvas.height,
         fps,
         duration,
-        audio: [
-          {
-            src: `${document.location.protocol}//commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`,
-            start: 2, // align with video
-            end: duration,
-            seek: 20, // align with video
-            volume: 0.8,
-          },
-        ],
+        audio: [{
+          src: `${document.location.protocol}//commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`,
+          start: 2, // align with video
+          end: duration,
+          seek: 20, // align with video
+          volume: 0.8,
+        }],
         renderTick: async ({ currentFrame, totalFrames, currentTime }) => {
             const startTickTime = performance.now();
             const progressFractional = currentFrame / totalFrames;
@@ -157,7 +155,7 @@ async function run() {
             `;
             document.body.appendChild(timeToRender);
 
-            // Create a time to render display
+            // Display rendered video
             const outputVideo = document.createElement('video');
             outputVideo.src = URL.createObjectURL(file);
             outputVideo.controls = true;

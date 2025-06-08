@@ -37,13 +37,21 @@ export default async function createAudioData(targetSampleRate, audioSources) {
   const totalAudioFrames = audioBuffer.duration * audioBuffer.sampleRate;
   const data = new Float32Array(totalAudioFrames * numberOfChannels);
 
+  // Get channel data
+  const channelData = [];
   for (let i = 0; i < numberOfChannels; i++) {
-    const channelData = audioBuffer.getChannelData(i);
-    data.set(channelData, i * channelData[0].length);
+    channelData.push(audioBuffer.getChannelData(i));
+  }
+
+  // Interleave the audio data
+  for (let i = 0; i < totalAudioFrames; i++) {
+    for (let channel = 0; channel < numberOfChannels; channel++) {
+      data[i * numberOfChannels + channel] = channelData[channel][i];
+    }
   }
 
   let audioData = new AudioData({
-      format: 'f32-planar',
+      format: 'f32',
       sampleRate: audioBuffer.sampleRate,
       numberOfFrames: totalAudioFrames,
       numberOfChannels: numberOfChannels,
