@@ -1,7 +1,7 @@
 import * as Comlink from "https://unpkg.com/comlink/dist/esm/comlink.mjs";
 import createCanvas from './create-canvas.js';
+import createTempFile from './create-temp-file.js';
 import renderCanvasImage from './render-canvas-image.js';
-import requestTempFile from './request-temp-file.js';
 import renderVideo from './render-video.js';
 import downloadFile from './download-file.js';
 import loadImage from './load-image.js';
@@ -13,7 +13,7 @@ async function run() {
   const { canvas, ctx } = createCanvas(1920, 1080);
 
   const fileName = 'test.mp4';
-  const fileEntry = await requestTempFile(fileName, 30);
+  const fileEntry = await createTempFile(fileName, 30);
   const fileWriter = await new Promise((resolve) => {
     fileEntry.createWriter(resolve);
   });
