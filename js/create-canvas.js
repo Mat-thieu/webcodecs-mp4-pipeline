@@ -9,9 +9,9 @@
 // }
 
 export default function initCanvas(width, height) {
-    const canvas = new OffscreenCanvas(width, height);
-    const ctx = canvas.getContext('2d');
-    // applyRetinaScaling(canvas, ctx);
+  const canvas = new OffscreenCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+  // applyRetinaScaling(canvas, ctx);
 
-    return { canvas, ctx };
+  return { canvas, ctx };
 }

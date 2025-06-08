@@ -10,7 +10,7 @@ class VideoReader { // Removed "export default"
   chunkSize = 0; // chunks of which the video file is read
   fileSize = 0; // Total measured size of the video file
   chunkOffset = 0; // Current chunk offset in the video file
-  
+
   // MP4Box configuration
   mp4boxFile = null; // MP4Box file instance
   videoTrack = null; // Video track
@@ -52,7 +52,7 @@ class VideoReader { // Removed "export default"
   }
 
   async setupMp4Box() {
-    console.log("Setting up MP4Box...");
+    console.log("Setting up MP4Box...", this);
     this.mp4boxFile = MP4Box.createFile();
     this.fileSize = await getFileSize(this.src);
 
@@ -64,7 +64,6 @@ class VideoReader { // Removed "export default"
           return;
         }
         this.totalSamples = this.videoTrack.nb_samples;
-        // console.log({ totalSamples: this.totalSamples, videoDurationInSeconds: this.videoTrack.duration / this.videoTrack.timescale });
 
         let sample = this.mp4boxFile.getTrackSample(this.videoTrack.id, 0);
 
@@ -76,7 +75,7 @@ class VideoReader { // Removed "export default"
   }
 
   async setupDecoder(sample) {
-    console.log("Setting up video decoder...");
+    console.log("Setting up video decoder...", this);
     const decoderDesc = getAvcDecoderDescription(sample);
 
     this.videoDecoder = new VideoDecoder({
@@ -126,7 +125,7 @@ class VideoReader { // Removed "export default"
   }
 
   setupSampleToDecoder() {
-    console.log("Setting up sample extraction...");
+    console.log("Setting up sample extraction...", this);
     // Extract samples from the video track
     this.mp4boxFile.setExtractionOptions(this.videoTrack.id, "USER_VIDEO_TRACK", {
       nbSamples: this.samplesPerChunk,
@@ -145,9 +144,6 @@ class VideoReader { // Removed "export default"
           duration: sample.duration,
           data: sample.data.buffer,
         });
-        if (this.videoDecoder.state !== "configured") {
-          console.error("VideoDecoder is not configured", this.videoDecoder.state, this.src);
-        }
         this.videoDecoder.decode(encodedChunk);
         this.mp4boxFile.releaseUsedSamples(this.videoTrack.id, sample.number + 1);
 
@@ -184,7 +180,7 @@ class VideoReader { // Removed "export default"
       return;
     }
     if (this.chunkOffset >= this.fileSize) {
-      console.log("Reached max size");
+      console.log("Reached max size", this);
       return false;
     }
     this.chunkReadInProgress = true;
@@ -308,7 +304,7 @@ function getAvcDecoderDescription(sample) {
 //     // The getBuffer() method of an MP4Box.Box object serializes it into an ArrayBuffer.
 //     // This ArrayBuffer is the HEVCDecoderConfigurationRecord needed by VideoDecoder.
 //     const hvcCBuffer = hvcCBox.getBuffer();
-    
+
 //     if (!(hvcCBuffer instanceof ArrayBuffer)) {
 //         console.error(
 //             "hvcCBox.getBuffer() did not return an ArrayBuffer. Actual type: ", 

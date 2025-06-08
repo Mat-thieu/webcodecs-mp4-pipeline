@@ -17,7 +17,7 @@ export default async function createAudioData(targetSampleRate, audioSources) {
 
         const bufferSource = audioContext.createBufferSource();
         bufferSource.buffer = audioBuffer;
-        
+
         // --- VOLUME CONTROL ---
         const gainNode = audioContext.createGain();
         gainNode.gain.value = source.volume || 1.0;
@@ -51,12 +51,12 @@ export default async function createAudioData(targetSampleRate, audioSources) {
   }
 
   let audioData = new AudioData({
-      format: 'f32',
-      sampleRate: audioBuffer.sampleRate,
-      numberOfFrames: totalAudioFrames,
-      numberOfChannels: numberOfChannels,
-      timestamp: 0,
-      data,
+    format: 'f32',
+    sampleRate: audioBuffer.sampleRate,
+    numberOfFrames: totalAudioFrames,
+    numberOfChannels: numberOfChannels,
+    timestamp: 0,
+    data,
   });
 
   return audioData;
